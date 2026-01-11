@@ -200,12 +200,46 @@ async function main() {
   }
 
   // Handle --random: pick a random animation ID from QQPR's known range
+  // Retry a few times if the ID doesn't exist or has no extractable frames
   if (a.random) {
-    // QQPR animation IDs are roughly in the range 1000-1200
     const minId = 1000;
     const maxId = 1200;
-    a.id = String(minId + Math.floor(Math.random() * (maxId - minId + 1)));
-    console.log(`Random animation: ${a.id}`);
+    const maxAttempts = 10;
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const randomId = String(minId + Math.floor(Math.random() * (maxId - minId + 1)));
+      const file = path.join(cacheDir, `${randomId}.js`);
+      const url = `https://www.qqpr.com/ascii/js/${randomId}.js`;
+      
+      console.log(`Random animation: ${randomId}` + (attempt > 1 ? ` (attempt ${attempt})` : ""));
+      
+      try {
+        if (!fs.existsSync(file)) {
+          console.log(`Downloading ${randomId}...`);
+          await downloadToFile(url, file);
+        }
+        
+        const src = fs.readFileSync(file, "utf8");
+        const frames = extractFrames(src);
+        
+        if (frames) {
+          a.id = randomId;
+          break;
+        } else {
+          // Invalid animation, remove from cache and try again
+          fs.unlinkSync(file);
+          if (attempt === maxAttempts) {
+            console.error("Could not find a valid random animation after multiple attempts.");
+            process.exit(1);
+          }
+        }
+      } catch (err) {
+        if (attempt === maxAttempts) {
+          console.error(`Error: ${err.message}`);
+          process.exit(1);
+        }
+      }
+    }
   }
 
   // Handle --info: show animation metadata
