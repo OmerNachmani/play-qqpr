@@ -71,3 +71,18 @@ QQPR animated ASCII art gallery: https://www.qqpr.com/animated-ascii-art.html
 ## License
 
 MIT
+
+## Run from GitHub (no npm publish)
+
+Clone and run:
+
+```bash
+git clone https://github.com/OmerNachmani/play-qqpr.git
+cd play-qqpr
+node ./bin/play-qqpr.mjs 1000
+
+Optional: make it a local command:
+
+chmod +x ./bin/play-qqpr.mjs
+./bin/play-qqpr.mjs 1044
+
