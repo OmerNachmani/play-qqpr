@@ -7,7 +7,16 @@ Play QQPR animated ASCII art in your terminal (by animation ID).
 ```bash
 git clone https://github.com/OmerNachmani/play-qqpr.git
 cd play-qqpr
-npm link
+chmod +x bin/play-qqpr.mjs
+
+# Add to your PATH (add this line to ~/.bashrc or ~/.zshrc):
+export PATH="$PATH:$HOME/play-qqpr/bin"
+```
+
+Or create a symlink in a directory already in your PATH:
+
+```bash
+ln -s "$PWD/bin/play-qqpr.mjs" ~/.local/bin/play-qqpr
 ```
 
 Then you can run `play-qqpr` from anywhere.
