@@ -1,23 +1,12 @@
 {
   "name": "play-qqpr",
   "version": "0.1.0",
+  "private": true,
   "description": "Play QQPR animated ASCII art in your terminal (by animation ID).",
   "type": "module",
-  "bin": {
-    "play-qqpr": "./bin/play-qqpr.mjs"
-  },
   "license": "MIT",
-  "keywords": ["ascii", "animation", "terminal", "cli", "qqpr"],
-  "engines": {
-    "node": ">=18"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OmerNachmani/play-qqpr.git"
-  },
-  "homepage": "https://github.com/OmerNachmani/play-qqpr#readme",
-  "bugs": {
-    "url": "https://github.com/OmerNachmani/play-qqpr/issues"
-  },
-  "files": ["bin", "README.md", "LICENSE"]
+  }
 }
