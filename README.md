@@ -1,26 +1,19 @@
-# play-qqpr
-
-Play QQPR animated ASCII art in your terminal (by animation ID).
-
-## Quick start (no install)
-
-Run directly with `npx`:
-
-```bash
-npx play-qqpr 1000
-npx play-qqpr 1044 --fps 12
-```
 
 ## Install
 
-Global install:
+Clone and run:
 
 ```bash
-npm i -g play-qqpr
-play-qqpr 1000
-```
+git clone https://github.com/OmerNachmani/play-qqpr.git
+cd play-qqpr
+node ./bin/play-qqpr.mjs 1000
 
-## Usage
+Optional: make it a local command:
+
+chmod +x ./bin/play-qqpr.mjs
+
+```
+## How to use
 
 ```bash
 play-qqpr <id> [--fps N] [--cache-dir PATH] [--no-download]
@@ -72,17 +65,5 @@ QQPR animated ASCII art gallery: https://www.qqpr.com/animated-ascii-art.html
 
 MIT
 
-## Run from GitHub (no npm publish)
-
-Clone and run:
-
-```bash
-git clone https://github.com/OmerNachmani/play-qqpr.git
-cd play-qqpr
-node ./bin/play-qqpr.mjs 1000
-
-Optional: make it a local command:
-
-chmod +x ./bin/play-qqpr.mjs
 ./bin/play-qqpr.mjs 1044
 
