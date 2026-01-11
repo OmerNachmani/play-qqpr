@@ -18,7 +18,7 @@ Usage:
 Options:
   --fps N         Frames per second (default: 10)
   --loop N        Loop N times then exit (default: infinite)
-  --random        Play a random animation from cache
+  --random        Play a random animation (downloads if needed)
   --info <id>     Show info about a cached animation
   --no-download   Only play if already cached
   --list          List cached animation IDs
@@ -195,15 +195,13 @@ async function main() {
     return;
   }
 
-  // Handle --random: pick a random cached animation
+  // Handle --random: pick a random animation ID from QQPR's known range
   if (a.random) {
-    const items = getCachedIds(cacheDir);
-    if (items.length === 0) {
-      console.error("No cached animations. Download some first with: play-qqpr <id>");
-      process.exit(1);
-    }
-    a.id = items[Math.floor(Math.random() * items.length)];
-    a.noDownload = true; // already cached
+    // QQPR animation IDs are roughly in the range 1000-1200
+    const minId = 1000;
+    const maxId = 1200;
+    a.id = String(minId + Math.floor(Math.random() * (maxId - minId + 1)));
+    console.log(`Random animation: ${a.id}`);
   }
 
   // Handle --info: show animation metadata

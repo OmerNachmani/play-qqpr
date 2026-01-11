@@ -51,7 +51,7 @@ play-qqpr --clear-cache
   Loop the animation N times then exit (default: infinite)
 
 - `--random`  
-  Play a random animation from the cache
+  Play a random animation (downloads if needed)
 
 - `--info <id>`  
   Show info about a cached animation (frame count, duration)
