@@ -9,35 +9,55 @@ function usage(exitCode = 0) {
 play-qqpr — play QQPR animated ASCII art in your terminal
 
 Usage:
-  play-qqpr <id> [--fps N] [--cache-dir PATH] [--no-download]
+  play-qqpr <id> [--fps N] [--loop N] [--cache-dir PATH] [--no-download]
+  play-qqpr --random [--fps N] [--loop N]
   play-qqpr --list
+  play-qqpr --info <id>
   play-qqpr --clear-cache
+
+Options:
+  --fps N         Frames per second (default: 10)
+  --loop N        Loop N times then exit (default: infinite)
+  --random        Play a random animation from cache
+  --info <id>     Show info about a cached animation
+  --no-download   Only play if already cached
+  --list          List cached animation IDs
+  --clear-cache   Delete all cached animations
 
 Examples:
   play-qqpr 1000
-  play-qqpr 1044 --fps 12
-  play-qqpr 1012 --no-download
+  play-qqpr 1044 --fps 12 --loop 3
+  play-qqpr --random
+  play-qqpr --info 1044
 `);
   process.exit(exitCode);
 }
 
 function parseArgs(argv) {
-  const args = { fps: 10, noDownload: false, list: false, clear: false, id: null, cacheDir: null };
+  const args = { fps: 10, loop: 0, noDownload: false, list: false, clear: false, random: false, info: false, id: null, cacheDir: null };
   const rest = [];
 
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--help" || a === "-h") usage(0);
     else if (a === "--fps") args.fps = Number(argv[++i] ?? NaN);
+    else if (a === "--loop") args.loop = Number(argv[++i] ?? NaN);
     else if (a === "--cache-dir") args.cacheDir = argv[++i];
     else if (a === "--no-download") args.noDownload = true;
     else if (a === "--list") args.list = true;
     else if (a === "--clear-cache") args.clear = true;
+    else if (a === "--random") args.random = true;
+    else if (a === "--info") args.info = true;
     else rest.push(a);
   }
 
   if (!Number.isFinite(args.fps) || args.fps <= 0) {
     console.error("Invalid --fps value");
+    usage(1);
+  }
+
+  if (args.loop !== 0 && (!Number.isFinite(args.loop) || args.loop < 0)) {
+    console.error("Invalid --loop value (must be a positive integer)");
     usage(1);
   }
 
@@ -147,15 +167,23 @@ function showCursor() {
   process.stdout.write("\x1b[?25h");
 }
 
+function getCachedIds(cacheDir) {
+  try {
+    return fs.readdirSync(cacheDir).filter(x => x.endsWith(".js")).map(x => x.replace(/\.js$/, ""));
+  } catch {
+    return [];
+  }
+}
+
 async function main() {
   const a = parseArgs(process.argv.slice(2));
   const cacheDir = a.cacheDir || defaultCacheDir();
   ensureDir(cacheDir);
 
   if (a.list) {
-    const items = fs.readdirSync(cacheDir).filter(x => x.endsWith(".js")).map(x => x.replace(/\.js$/, ""));
+    const items = getCachedIds(cacheDir);
     if (items.length === 0) console.log("(cache empty)");
-    else console.log(items.sort().join("\n"));
+    else console.log(items.sort((x, y) => Number(x) - Number(y)).join("\n"));
     return;
   }
 
@@ -164,6 +192,43 @@ async function main() {
       if (f.endsWith(".js")) fs.unlinkSync(path.join(cacheDir, f));
     }
     console.log(`Cleared cache: ${cacheDir}`);
+    return;
+  }
+
+  // Handle --random: pick a random cached animation
+  if (a.random) {
+    const items = getCachedIds(cacheDir);
+    if (items.length === 0) {
+      console.error("No cached animations. Download some first with: play-qqpr <id>");
+      process.exit(1);
+    }
+    a.id = items[Math.floor(Math.random() * items.length)];
+    a.noDownload = true; // already cached
+  }
+
+  // Handle --info: show animation metadata
+  if (a.info) {
+    if (!a.id) {
+      console.error("--info requires an animation ID");
+      usage(1);
+    }
+    const id = String(a.id).trim();
+    const file = path.join(cacheDir, `${id}.js`);
+    if (!fs.existsSync(file)) {
+      console.error(`Animation ${id} not in cache. Download it first.`);
+      process.exit(1);
+    }
+    const src = fs.readFileSync(file, "utf8");
+    const frames = extractFrames(src);
+    if (!frames) {
+      console.error("Could not extract frames from this animation.");
+      process.exit(1);
+    }
+    const duration = (frames.length / a.fps).toFixed(1);
+    console.log(`Animation ID: ${id}`);
+    console.log(`Frames: ${frames.length}`);
+    console.log(`Duration at ${a.fps} fps: ${duration}s per loop`);
+    console.log(`Cache file: ${file}`);
     return;
   }
 
@@ -194,14 +259,11 @@ async function main() {
     process.exit(1);
   }
 
-  let i = 0;
-  hideCursor();
+  let frameIndex = 0;
+  let loopCount = 0;
+  const maxLoops = a.loop > 0 ? a.loop : Infinity;
 
-  const timer = setInterval(() => {
-    clearScreen();
-    process.stdout.write(frames[i]);
-    i = (i + 1) % frames.length;
-  }, 1000 / a.fps);
+  hideCursor();
 
   const cleanup = () => {
     clearInterval(timer);
@@ -209,6 +271,20 @@ async function main() {
     showCursor();
     process.exit(0);
   };
+
+  const timer = setInterval(() => {
+    clearScreen();
+    process.stdout.write(frames[frameIndex]);
+    frameIndex++;
+    
+    if (frameIndex >= frames.length) {
+      frameIndex = 0;
+      loopCount++;
+      if (loopCount >= maxLoops) {
+        cleanup();
+      }
+    }
+  }, 1000 / a.fps);
 
   process.on("SIGINT", cleanup);
   process.on("SIGTERM", cleanup);

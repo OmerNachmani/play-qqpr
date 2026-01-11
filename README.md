@@ -15,8 +15,10 @@ Then you can run `play-qqpr` from anywhere.
 ## Usage
 
 ```bash
-play-qqpr <id> [--fps N] [--cache-dir PATH] [--no-download]
+play-qqpr <id> [--fps N] [--loop N] [--cache-dir PATH] [--no-download]
+play-qqpr --random [--fps N] [--loop N]
 play-qqpr --list
+play-qqpr --info <id>
 play-qqpr --clear-cache
 ```
 
@@ -24,7 +26,9 @@ play-qqpr --clear-cache
 
 ```bash
 play-qqpr 1044
-play-qqpr 1012 --fps 6
+play-qqpr 1012 --fps 6 --loop 3
+play-qqpr --random
+play-qqpr --info 1044
 play-qqpr --list
 play-qqpr --clear-cache
 ```
@@ -33,6 +37,15 @@ play-qqpr --clear-cache
 
 - `--fps N`  
   Frames per second (default: 10)
+
+- `--loop N`  
+  Loop the animation N times then exit (default: infinite)
+
+- `--random`  
+  Play a random animation from the cache
+
+- `--info <id>`  
+  Show info about a cached animation (frame count, duration)
 
 - `--cache-dir PATH`  
   Override cache directory
@@ -63,6 +76,4 @@ QQPR animated ASCII art gallery: https://www.qqpr.com/animated-ascii-art.html
 ## License
 
 MIT
-
-./bin/play-qqpr.mjs 1044
 
