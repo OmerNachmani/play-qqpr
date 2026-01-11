@@ -1,19 +1,18 @@
+# play-qqpr
+
+Play QQPR animated ASCII art in your terminal (by animation ID).
 
 ## Install
-
-Clone and run:
 
 ```bash
 git clone https://github.com/OmerNachmani/play-qqpr.git
 cd play-qqpr
-node ./bin/play-qqpr.mjs 1000
-
-Optional: make it a local command:
-
-chmod +x ./bin/play-qqpr.mjs
-
+npm link
 ```
-## How to use
+
+Then you can run `play-qqpr` from anywhere.
+
+## Usage
 
 ```bash
 play-qqpr <id> [--fps N] [--cache-dir PATH] [--no-download]

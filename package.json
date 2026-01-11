@@ -4,7 +4,13 @@
   "private": true,
   "description": "Play QQPR animated ASCII art in your terminal (by animation ID).",
   "type": "module",
+  "bin": {
+    "play-qqpr": "./bin/play-qqpr.mjs"
+  },
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OmerNachmani/play-qqpr.git"
