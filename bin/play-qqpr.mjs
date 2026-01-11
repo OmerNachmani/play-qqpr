@@ -3,6 +3,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import https from "https";
+import http from "http";
 
 function usage(exitCode = 0) {
   console.log(`
@@ -122,7 +123,10 @@ function extractFrames(code) {
 
 function httpGetFollow(url, maxRedirects = 5) {
   return new Promise((resolve, reject) => {
-    const req = https.get(url, { headers: { "User-Agent": "play-qqpr" } }, (res) => {
+    const parsedUrl = new URL(url);
+    const client = parsedUrl.protocol === "https:" ? https : http;
+    
+    const req = client.get(url, { headers: { "User-Agent": "play-qqpr" } }, (res) => {
       const code = res.statusCode ?? 0;
 
       // Redirect?
